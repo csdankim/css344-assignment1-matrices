@@ -1,0 +1,58 @@
+#!/bin/bash
+
+########################
+###### matrix dims #####
+########################
+
+#matrix dims [MATRIX]
+#Prints error message to stderr, nothing to stdout and return value != 0 if:
+#Argument count is greater than 1 (e.g. `matrix dims m1 m2`).
+#Argument count is 1 but the file named by argument 1 is not readable (e.g. `matrix dims no_such_file`).
+#Otherwise, prints "ROWS COLS" (Space separated!) to stdout, nothing to stderr, and returns 0.
+
+
+row=0
+cal=0
+
+cat > tmp
+
+row= $(cat tmp | head -n 1 | wc -w)
+cal= $(cat tmp | wc -l)
+
+
+
+
+function dims(){
+  if [ "$1" == "dims" ] 
+  then
+        #test for correct number of arguments
+      if [ "$#" -gt 2 ] 
+      then
+        echo "INCORRECT NUMBNER OF ARGUMENTS FOR FUNCTION" 1>&2
+        exit 1
+      fi
+
+        #test for valid file name
+      if [ ! -f "$2" ]
+      then
+        echo "INVALID FILE" 1>&2
+        exit 1
+      fi
+       
+        #count row cal
+      
+      if [ "$#" -lt 2 ]
+      then
+        cat > tmp
+        row = 0
+        cal = 0
+
+        row = $(cat tmp | head -n 1 | wc -w)
+        cal = $(cat tmp | wc -l)
+
+        echo $row $ cal
+      fi  
+  fi
+}
+
+#matrix_dims $1 $2
