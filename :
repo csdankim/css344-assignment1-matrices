@@ -1,0 +1,159 @@
+#!/bin/bash
+
+########################
+###### matrix dims #####
+########################
+
+
+
+
+
+#if [ "$1" == "dims" ] 
+#  then
+#        #test for correct number of arguments
+#      if [ "$#" -gt 2 ] 
+#      then
+#        echo "INCORRECT NUMBNER OF ARGUMENTS FOR FUNCTION" 1>&2
+#        exit 1
+#      fi
+#
+#        #test for valid file name
+#      if [ ! -f "$2" ]
+#      then
+#        echo "INVALID FILE" 1>&2
+#        exit 1
+#      fi
+#       
+#        #count row cal
+#      
+#      if [ "$#" -lt 2 ]
+#      then
+#        cat > tmp
+#        returnsow = 0
+#        cal = 0
+#
+#        row = $(cat tmp | head -n 1 | wc -w)
+#        col = $(cat tmp | wc -l)
+#
+#        echo $row $ cal
+#      fi  
+#  fi
+#}
+#
+
+
+
+
+dims() {
+  if [[ "$#" -gt 1 ]]
+  then 
+      exit 1
+  fi
+  if [[ "$#" -eq 1 ]]
+  then
+      read $1
+  else
+      read stdin
+  fi
+
+  cat $1 > tmp
+  #cat > tmp
+  col1=$(cat tmp | head -n 1 | wc -w)
+  row1=$(cat tmp | wc -l)
+  echo $col1 $row1
+  
+  rm -rf tmp
+}
+
+transpose() {  
+  if [[ "$#" -gt 1 ]]
+  then
+    exit 1
+  fi
+  if [[ "$#" -eq 1 ]]
+  then
+     read $1
+  else
+     read stdin
+  fi
+
+  cat $1 > tmp
+  col=$(cat tmp | head -n 1 | wc -w)
+  
+  for ((i=1;i <= $col;i++))
+  do
+    cut -f $i $1 | tr '\n' '\t' | rev | cut -c 2- | rev
+  done
+  rm -rf tmp
+}
+
+mean() {
+  if [[ "$#" -gt 1 ]]
+  then 
+     exit 1
+  fi
+  if [[ "$#" -eq 1 ]]
+  then
+     read $1
+  else
+     read stdin
+  fi
+  
+  cat $1 > tmp
+  col=$(cat tmp | head -n 1 | wc -w)
+  row=$(cat tmp | wc -l)
+#  echo $col $row
+  for ((i=1;i <= $col;i++))
+  do 
+    cat $1 | cut -f $i | tr '\n' '\t' > tmp1
+    
+    sum=0
+
+    for ((j=1;j <= $row;j++))
+    do
+      ele=$( cat tmp1 | cut -f $j )
+      sum=$(( $sum+$ele ))
+    done
+   # echo $ele $sum
+    echo $(( ( $sum+($row/2)*( ($sum>0)*2-1 )) / $row )) >> mean
+  done
+
+  cat mean | tr '\n' '\t' | rev | cut -c 2- | rev
+
+  rm -rf tmp tmp1 mean
+}
+
+add() {
+  cat $1 > tmp1
+  cat $2 > tmp2
+  col1=$(cat tmp1 | head -n 1 | wc -w)
+  row1=$(cat tmp1 | wc -l)
+  col2=$(cat tmp2 | head -n 1 | wc -w)
+  row2=$(cat tmp2 | wc -l)
+  echo $col1 $row1 $col2 $row2
+
+  if [[ $col1 -ne $col2 ]] || [[ $row1 -ne $row2 ]]
+  then
+     echo "Invalid Dimensions for adding" 1>&2
+     exit 1
+  fi
+
+  for ((i=1;i <= $row1;i++))
+  do
+    add=0
+    for ((j=1;j <= $col1;j++))
+    do
+      ele1=$( cat tmp1 | head -n $i | tail -n 1 | cut -f $j )
+      ele2=$( cat tmp2 | head -n $i | tail -n 1 | cut -f $j )
+      #echo $ele1 $ele2
+      echo $(( $sum + ( $ele1+$ele2 ) )) >> add
+      cat add | tr '\n' '\t' | rev | cut -c 2-| rev
+      rm -rf add
+    done
+  done
+  
+  rm -rf tmp1 tmp2  
+}
+#multiply() {}
+
+$@
