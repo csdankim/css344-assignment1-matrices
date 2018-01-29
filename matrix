@@ -41,13 +41,24 @@
 #}
 #
 
-
-
+#count1() {
+#  cat $1 > tmp1
+#  col1=$(cat tmp1 | head -n 1 | wc -w)
+#  row1=$(cat tmp1 | wc -l)
+#}
+#
+#count2() {
+#  cat $2 > tmp2
+#  col2=$(cat tmp2 | head -n 1 | wc -w)
+#  row2=$(cat tmp2 | wc -l)
+#}
+#
 
 dims() {
   if [[ "$#" -gt 1 ]]
   then 
-      exit 1
+    echo "INCORRECT NUMBNER OF ARGUMENTS FOR FUNCTION" 1>&2  
+    exit 1
   fi
   if [[ "$#" -eq 1 ]]
   then
@@ -57,7 +68,6 @@ dims() {
   fi
 
   cat $1 > tmp
-  #cat > tmp
   col1=$(cat tmp | head -n 1 | wc -w)
   row1=$(cat tmp | wc -l)
   echo $col1 $row1
@@ -108,13 +118,11 @@ mean() {
     cat $1 | cut -f $i | tr '\n' '\t' > tmp1
     
     sum=0
-
     for ((j=1;j <= $row;j++))
     do
       ele=$( cat tmp1 | cut -f $j )
       sum=$(( $sum+$ele ))
     done
-   # echo $ele $sum
     echo $(( ( $sum+($row/2)*( ($sum>0)*2-1 )) / $row )) >> mean
   done
 
@@ -130,7 +138,6 @@ add() {
   row1=$(cat tmp1 | wc -l)
   col2=$(cat tmp2 | head -n 1 | wc -w)
   row2=$(cat tmp2 | wc -l)
-  #echo $col1 $row1 $col2 $row2
 
   if [[ $col1 -ne $col2 ]] || [[ $row1 -ne $row2 ]]
   then
@@ -145,17 +152,13 @@ add() {
     do
       ele1=$( cat tmp1 | head -n $i | tail -n 1 | cut -f $j )
       ele2=$( cat tmp2 | head -n $i | tail -n 1 | cut -f $j )
-      #echo $ele1 $ele2
-      #echo $(( $sum + ( $ele1+$ele2 ) )) >> add
-      add=$(( $ele1+$ele2 ))
-      echo $add | tr '\n' '\t' | rev | cut -c 2-| rev
-      #rm -rf add
-      #echo -e "\n"
+      echo $(( $ele1+$ele2 )) >> add
     done
-
+    cat add | tr '\n' '\t' | rev | cut -c 2- | rev
+    rm -rf add
   done
   
-  rm -rf tmp1 tmp2 add  
+  rm -rf tmp1 tmp2 
 }
 
 multiply() {
@@ -173,14 +176,18 @@ multiply() {
     do
       ele1=$( cat tmp1 | head -n $i | tail -n 1 | cut -f $j )
       ele2=$( cat tmp1 | head -n $i | tail -n 1 | cut -f $j )
-      echo $(( $ele1*$ele2 )) > add
-      cat add | tr '\n' '\t' | rev | cut -c 2- | rev
-      #rm -rf add
+      echo $(( $ele1*$ele2 )) >> add
     done
+    cat add | tr '\n' '\t' | rev | cut -c 2- | rev
+    rm -rf add
   done
 
-  rm -rf tmp1 tmp2 add
+  rm -rf tmp1 tmp2
 }
 
+#error handling
+if [[ "$1" == dims ]] || [[ "$1" == transpose ]] || [[ "$1" == mean ]]
+then 
+  
 
 $@
