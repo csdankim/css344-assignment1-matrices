@@ -55,18 +55,18 @@
 #
 
 dims() {
-  if [[ "$#" -gt 1 ]]
-  then 
-    echo "INCORRECT NUMBNER OF ARGUMENTS FOR FUNCTION" 1>&2  
-    exit 1
-  fi
-  if [[ "$#" -eq 1 ]]
-  then
-      read $1
-  else
-      read stdin
-  fi
-
+#  if [[ "$#" -gt 1 ]]
+#  then 
+#    echo "INCORRECT NUMBNER OF ARGUMENTS FOR FUNCTION" 1>&2  
+#    exit 1
+#  fi
+#  if [[ "$#" -eq 1 ]]
+#  then
+#      read $1
+#  else
+#      read stdin
+#  fi
+#
   cat $1 > tmp
   col1=$(cat tmp | head -n 1 | wc -w)
   row1=$(cat tmp | wc -l)
@@ -76,17 +76,17 @@ dims() {
 }
 
 transpose() {  
-  if [[ "$#" -gt 1 ]]
-  then
-    exit 1
-  fi
-  if [[ "$#" -eq 1 ]]
-  then
-     read $1
-  else
-     read stdin
-  fi
-
+#  if [[ "$#" -gt 1 ]]
+#  then
+#    exit 1
+#  fi
+#  if [[ "$#" -eq 1 ]]
+#  then
+#     read $1
+#  else
+#     read stdin
+#  fi
+#
   cat $1 > tmp
   col=$(cat tmp | head -n 1 | wc -w)
   
@@ -98,16 +98,16 @@ transpose() {
 }
 
 mean() {
-  if [[ "$#" -gt 1 ]]
-  then 
-     exit 1
-  fi
-  if [[ "$#" -eq 1 ]]
-  then
-     read $1
-  else
-     read stdin
-  fi
+#  if [[ "$#" -gt 1 ]]
+#  then 
+#     exit 1
+#  fi
+#  if [[ "$#" -eq 1 ]]
+#  then
+#     read $1
+#  else
+#     read stdin
+#  fi
   
   cat $1 > tmp
   col=$(cat tmp | head -n 1 | wc -w)
@@ -169,13 +169,13 @@ multiply() {
   col2=$(cat tmp2 | head -n 1 | wc -w)
   row2=$(cat tmp2 | wc -l)
 
-  for ((i=1;i <=row1;i++))
+  for ((i=1;i <=row2;i++))
   do
     add=0
     for ((j=1;j <= col2;j++))
     do
       ele1=$( cat tmp1 | head -n $i | tail -n 1 | cut -f $j )
-      ele2=$( cat tmp1 | head -n $i | tail -n 1 | cut -f $j )
+      ele2=$( cat tmp2 | head -n $i | tail -n 1 | cut -f $j )
       echo $(( $ele1*$ele2 )) >> add
     done
     cat add | tr '\n' '\t' | rev | cut -c 2- | rev
@@ -186,8 +186,33 @@ multiply() {
 }
 
 #error handling
-#if [[ "$1" == dims ]] || [[ "$1" == transpose ]] || [[ "$1" == mean ]]
-#then 
-  
+func=$1
+if [[ "$func" == "dims" ]] || [[ "$func" == "transpose" ]] || [[ "$func" == "mean" ]]
+then
+  matrix_stdin="${2:-/dev/stdin}"  
+  if test "$3"
+  then 
+    echo "invalid number of input files" 1>&2
+    exit 1
+  elif ! [[ -r $2 ]]
+  then 
+    echo "file is not readable" 1>&2
+  else
+    $func $matrix_stdin
+  fi
+elif [[ "$func" == "add" ]] || [[ "$func" == "multiply" ]]
+then
+  if (($#==1)) || test "$4"
+  then 
+    echo "invalid number of input files" 1>&2
+    exit 1
+  else
+    $func $2 $3
+  fi
+else
+  echo "invalid function name" 1>&2
+  exit 1
+fi
 
-#$@
+
+$@
