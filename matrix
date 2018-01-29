@@ -186,8 +186,8 @@ multiply() {
 }
 
 #error handling
-if [[ "$1" == dims ]] || [[ "$1" == transpose ]] || [[ "$1" == mean ]]
-then 
+#if [[ "$1" == dims ]] || [[ "$1" == transpose ]] || [[ "$1" == mean ]]
+#then 
   
 
-$@
+#$@
